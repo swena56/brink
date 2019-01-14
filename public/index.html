@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>React JS</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<!-- src/js/ -->
+	<script src="src/js/react.production.min.js"></script>
+	<script src="src/js/react-dom.production.min.js"></script>
+	<script src="src/js/prop-types.min.js"></script>
+	<script src="src/js/browser.min.js"></script>
+	<script src="src/js/jquery-3.2.1.slim.min.js"></script>
+	<script src="src/js/popper.min.js"></script>
+	<script src="src/js/bootstrap.min.js"></script>
+	<script src="src/js/math.min.js"></script>
+	<script src="src/js/react-chartjs.min.js"></script>
+	<script src="src/js/bootbox.min.js"></script>
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.13.1/bootstrap-table.min.js"></script> -->
+
+	<!-- src/css -->
+	<link rel="stylesheet" href="src/css/font-awesome.min.css" >
+	<link rel="stylesheet" href="src/css/bootstrap.min.css">
+	<link rel="stylesheet" href="src/css/animate.min.css">
+	
+	<style type="text/css">
+	
+	</style>
+	
+</head>
+<body>
+	<h2>Brink</h2>
+	<iframe src="piechart.html" width="300" height="250" frameBorder="0"></iframe>
+	<div id="app"></div>
+	<script type="text/babel">
+
+		class Table extends React.Component {
+
+			constructor(props) {
+		        super(props);
+		    }
+
+
+		    render() {
+
+		    	if( ! this.props.data ){
+		    		return (<div>Loading</div>);
+		    	}
+
+		        return (
+		        	<div>
+		        	 	<table className="table table-striped" >
+							<thead className="thead-dark">
+							<tr>
+								<th>Status</th>
+								<th>Date</th>
+								<th>Url ({this.props.data.length}) </th>
+							</tr>
+							</thead>
+							<tbody>
+							{
+								this.props.data.map(( col ) => {
+			                         return (
+					                          <tr>
+					                          	<td>{col.status}</td>
+					                          	<td>{col.date || ''}</td>
+					                          	<td>
+					                          		<div>
+					                          			<a target="_blank" href={col.url}>{col.url}</a>
+					                          		</div>
+					                          		<div>{col.title}</div>
+					                          	</td>
+					                           </tr>
+					                   		);
+						         })
+							}
+							</tbody>
+						</table>
+
+					</div>
+		        );
+		    }
+		}
+
+		class Stats extends React.Component {
+
+		    constructor(props) {
+		        super(props);
+		        this.state = {
+		        	data: [],
+		        };
+
+		        console.log( this.state);
+		    }
+
+		    componentDidMount() {
+			    fetch('/count')
+			      .then(response => response.json())
+			      .then(data => this.setState({ data }));
+			}
+
+		    render() {
+
+		    	if( ! this.state.data || ! this.state.data.data ){
+		    		return (<div>Loading</div> );
+		    	}
+		        return (
+		        	<div> Total Urls: {this.state.data.data.total}, Broken: {this.state.data.data.broken.length},</div> 
+		        );
+		    }
+		}
+
+		class ComponentName extends React.Component {
+
+		    constructor(props) {
+		        super(props);
+		        this.state = {
+		        	urls: [],
+		        };
+		    }
+
+
+		    componentDidMount() {
+			    fetch('/urls')
+			      .then(response => response.json())
+			      .then(data => this.setState({ urls: data.scanned }));
+
+			    fetch('/broken')
+			      .then(response => response.json())
+			      .then(data => this.setState({ broken: data.scanned }));
+			}
+
+		    render() {
+		        return (
+		        	<div>
+		        		<Stats />
+		        		<Table data={this.state.broken}/>
+		        	 	<Table data={this.state.urls}/>
+					</div>
+		        );
+		    }
+		}
+
+		ReactDOM.render(<ComponentName />, document.querySelector('#app'))
+	</script>
+</body>
+</html>
